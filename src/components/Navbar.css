@@ -1,0 +1,23 @@
+.nav-logo{
+  height: 2.5rem;
+  background-color: white;
+}
+
+.nav-login-text{
+  margin-right: -7rem;
+  margin-left: 3rem;
+}
+
+.nav-bar{
+  background-color: #703b09;
+}
+
+.nav-bar span {
+  color:white;
+}
+
+.link {
+  text-decoration: none !important;
+  color: inherit !important;
+  margin: 0rem 1rem;
+}
