@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { addUser } from './features/users/usersSlice';
+
 
 function SignupPage() {
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     username: '',
     email: '',
     password: '',
-    gender: '', 
+    gender: '',
     profilePicture: null
   });
 
@@ -37,6 +43,7 @@ function SignupPage() {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(formData);
+    dispatch(addUser(formData));
   };
 
   return (

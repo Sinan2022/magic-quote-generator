@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { loginSuccess, loginFailure } from './features/auth/authSilce';
 
 function LoginPage() {
+  const dispatch = useDispatch();
+  const authError = useSelector((state) => state.auth.error);
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -17,9 +20,9 @@ function LoginPage() {
     }));
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log('Login', formData);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(loginSuccess({email: formData.username, password: formData.password}));
   };
 
   return (
