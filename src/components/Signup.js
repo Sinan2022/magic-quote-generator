@@ -1,57 +1,99 @@
-import React, { useState } from 'react';
+
+
+
+import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Row, Col } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { addUser } from './features/users/usersSlice';
+import { useDispatch } from 'react-redux';
+import { addUser, editUser } from './features/users/usersSlice';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { app } from '../firebase';
+
+const storage = getStorage(app);
 
 
-function SignupPage() {
+function UserForm({ isEditMode = false, userData = null }) {
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.users);
 
-  const [formData, setFormData] = useState({
+  const defaultFormData = {
     firstName: '',
     lastName: '',
     username: '',
     email: '',
     password: '',
     gender: '',
-    profilePicture: null
-  });
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    if (name === 'profilePicture') {
-      setFormData(prevState => ({
-        ...prevState,
-        profilePicture: event.target.files[0]
-      }));
-    } else {
-      setFormData(prevState => ({
-        ...prevState,
-        [name]: value
-      }));
-    }
+    profilePicture: ''
   };
 
-  const handlePictureChange = (event) => {
+  const [formData, setFormData] = useState(defaultFormData);
+
+  useEffect(() => {
+    if (isEditMode && userData) {
+      setFormData({
+        ...userData,
+        profilePicture: null
+      });
+    }
+  }, [isEditMode, userData]);
+
+  const handleChange = (event) => {
+    const { name, value, files } = event.target;
     setFormData(prevState => ({
       ...prevState,
-      profilePicture: event.target.files[0]
+      [name]: name === 'profilePicture' ? files[0] : value
     }));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(formData);
-    dispatch(addUser(formData));
+
+    if (isEditMode) {
+      dispatch(editUser(formData));
+    } else {
+      dispatch(addUser(formData));
+    }
+  };
+
+  const uploadFileAndGetUrl = (file) => {
+    return new Promise((resolve, reject) => {
+      const storageRef = ref(storage, file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          var progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+        },
+        (error) => {
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log("File available at", downloadURL);
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
+  };
+
+  const handlePictureChange = async (event) => {
+    const receiptUrl = await uploadFileAndGetUrl(event.target.files[0]);
+    setFormData(prevState => ({
+      ...prevState,
+      profilePicture: receiptUrl
+    }));
   };
 
   return (
     <Container>
       <Row className="justify-content-md-center">
         <Col md={6}>
-          <h1 className="text-center mb-4">Sign Up</h1>
+          <h1 className="text-center mb-4">{isEditMode ? 'Edit Profile' : 'Sign Up'}</h1>
           <Form onSubmit={handleSubmit}>
+            {/* First Name */}
             <Form.Group className="mb-3" controlId="formBasicFirstName">
               <Form.Label>First Name</Form.Label>
               <Form.Control
@@ -63,6 +105,8 @@ function SignupPage() {
                 required
               />
             </Form.Group>
+
+            {/* Last Name */}
             <Form.Group className="mb-3" controlId="formBasicLastName">
               <Form.Label>Last Name</Form.Label>
               <Form.Control
@@ -74,6 +118,8 @@ function SignupPage() {
                 required
               />
             </Form.Group>
+
+            {/* Username */}
             <Form.Group className="mb-3" controlId="formBasicUsername">
               <Form.Label>Username</Form.Label>
               <Form.Control
@@ -85,6 +131,8 @@ function SignupPage() {
                 required
               />
             </Form.Group>
+
+            {/* Email */}
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control
@@ -96,6 +144,8 @@ function SignupPage() {
                 required
               />
             </Form.Group>
+
+            {/* Password */}
             <Form.Group className="mb-3" controlId="formBasicPassword">
               <Form.Label>Password</Form.Label>
               <Form.Control
@@ -107,6 +157,8 @@ function SignupPage() {
                 required
               />
             </Form.Group>
+
+            {/* Gender */}
             <Form.Group className="mb-3" controlId="formBasicGender">
               <Form.Label>Gender</Form.Label>
               <Form.Select
@@ -122,6 +174,8 @@ function SignupPage() {
                 <option value="Other">Other</option>
               </Form.Select>
             </Form.Group>
+
+            {/* Profile Picture */}
             <Form.Group controlId="formProfilePicture" className="mb-3">
               <Form.Label>Profile Picture</Form.Label>
               <Form.Control
@@ -130,9 +184,11 @@ function SignupPage() {
                 onChange={handlePictureChange}
               />
             </Form.Group>
+
+            {/* Submit Button */}
             <div className="d-grid gap-2">
               <Button variant="primary" type="submit">
-                Submit
+                {isEditMode ? 'Update' : 'Submit'}
               </Button>
             </div>
           </Form>
@@ -142,4 +198,4 @@ function SignupPage() {
   );
 }
 
-export default SignupPage;
+export default UserForm;
