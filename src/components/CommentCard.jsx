@@ -144,6 +144,7 @@ export default function CommentCard({
                     quoteIndex={qouteIndex}
                     setQout={setQout}
                     qoutes={qoutes}
+                    currentUser={user}
                   />
                 ))}
               </MDBCardBody>

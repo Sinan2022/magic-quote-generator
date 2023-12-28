@@ -12,6 +12,7 @@ const Comment = ({
   commentIndex,
   setQout,
   qoutes,
+  currentUser,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const handleCloseModal = () => setShowModal(false);
@@ -89,10 +90,10 @@ const Comment = ({
           <p className="small mb-0">{comment}</p>
         </div>
       </div>
-      <span>
+      {(currentUser.email == name) && <span>
         <EditIcon onClick={handleShowModal} style={{ marginRight: "8px" }} />
         <DeleteIcon onClick={handleDeleteComment} />
-      </span>
+      </span>}
     </div>
   );
 };
