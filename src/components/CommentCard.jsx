@@ -13,6 +13,11 @@ import {
   MDBTextArea,
 } from "mdb-react-ui-kit";
 import Comment from "./Cards/Comment";
+import Badge from "react-bootstrap/Badge";
+import Stack from "react-bootstrap/Stack";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddQuoteModal from './Modals/AddQuoteModal';
 // import { useDispatch, useSelector } from 'react-redux';
 // import { selectAuth } from './features/auth/authSilce';
 
@@ -37,7 +42,17 @@ export default function CommentCard({
   //
 
   // const { isAuthenticated, user } = useSelector(selectAuth);
+  const [showModal, setShowModal] = useState(false);
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = () => setShowModal(true);
 
+
+
+  const tagsOptions = [
+    { name: "sports", id: 1 },
+    { name: "life", id: 2 },
+    { name: "inspiration", id: 3 }
+  ];
   const user = {
     user: {
       firstName: "sinasn",
@@ -82,6 +97,18 @@ export default function CommentCard({
     setNewComment("");
   };
 
+  const handleDelete = (qoutes, index) => {
+
+    if (index > -1 && index < qoutes.length) {
+      // Remove the item at the specified index
+      qoutes.splice(index, 1);
+  }
+  debugger
+  setQout(qoutes);
+
+
+  }
+
   const updateCommentsForQoute = (quoteIndex, updatedComments) => {
     qoutes[index].comments = [...updatedComments];
     setQout(qoutes);
@@ -104,12 +131,32 @@ export default function CommentCard({
                   <div>
                     <h6 className="fw-bold text-primary mb-1">
                       {qoute?.author}
+                      {user.email == qoute.author && (
+                        <>
+                          <EditIcon onClick={handleShowModal} style={{ marginRight: "8px" }} />
+                          <DeleteIcon onClick={() => handleDelete(qoutes, index)} />
+                        </>
+                      )}
                     </h6>
+
                     <p className="text-muted small mb-0">
                       Shared - {`${qoute?.createdDate}, ${qoute?.createdTime}`}
                     </p>
                   </div>
                 </div>
+
+                <br />
+                <Stack direction="horizontal" gap={2}>
+                  {qoute.tags.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      bg="dark"
+                      style={{ marginRight: "10px" }}
+                    >
+                      {tag.name}
+                    </Badge>
+                  ))}
+                </Stack>
 
                 <p className="mt-3 mb-4 pb-2">{qoute?.quote}</p>
 
@@ -140,11 +187,12 @@ export default function CommentCard({
                     commentIndex={commentIndex}
                     name={comment.author} // Assuming 'author' is the name you want to display
                     avatar={getProfilePictureByEmail(users, comment.author)} // Replace with actual avatar URL or a field from 'comment'
-                    comment={comment.comment}
+                    comment={comment}
                     quoteIndex={qouteIndex}
                     setQout={setQout}
                     qoutes={qoutes}
                     currentUser={user}
+                    toggleLikeOrDislike={toggleLikeOrDislike}
                   />
                 ))}
               </MDBCardBody>
@@ -189,6 +237,15 @@ export default function CommentCard({
           </MDBCol>
         </MDBRow>
       </MDBContainer>
+      <AddQuoteModal
+        show={showModal}
+        handleClose={handleCloseModal}
+        tagsOptions={tagsOptions}
+        initialQuote={qoute}
+        index={index}
+        setQout={setQout}
+        qoutes={qoutes}
+      />
     </section>
   );
 }

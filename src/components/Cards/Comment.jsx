@@ -3,6 +3,7 @@ import { MDBCardImage } from "mdb-react-ui-kit";
 import EditCommentModal from "../Modals/EditCommentModal";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import "./Comment.css";
 
 const Comment = ({
   name,
@@ -13,6 +14,7 @@ const Comment = ({
   setQout,
   qoutes,
   currentUser,
+  toggleLikeOrDislike,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const handleCloseModal = () => setShowModal(false);
@@ -23,7 +25,6 @@ const Comment = ({
     setShowModal(true);
     // Add your logic here
   };
-
   const removeComment = (quotes, quoteIndex, commentIndex) => {
     // Make sure the indices are within the bounds
     if (quoteIndex === undefined || commentIndex === undefined) {
@@ -55,45 +56,84 @@ const Comment = ({
   };
 
   return (
-    <div className="d-flex flex-start mt-4">
-      {/* <AddQuoteModal
+    <div>
+      <div className="d-flex flex-start mt-4">
+        {/* <AddQuoteModal
         show={showModal}
         handleClose={handleCloseModal}
         tagsOptions={tagsOptions}
       /> */}
-      {showModal && (
-        <EditCommentModal
-          show={showModal}
-          handleClose={handleCloseModal}
-          commentVal={comment}
-          quoteIndex={quoteIndex}
-          commentIndex={commentIndex}
-          setQout={setQout}
-          qoutes={qoutes}
-        />
-      )}
-      <a className="me-3" href="#">
-        <MDBCardImage
-          className="rounded-circle shadow-1-strong me-3"
-          src={avatar}
-          alt="avatar"
-          width="65"
-          height="65"
-        />
-      </a>
+        {showModal && (
+          <EditCommentModal
+            show={showModal}
+            handleClose={handleCloseModal}
+            commentVal={comment.comment}
+            quoteIndex={quoteIndex}
+            commentIndex={commentIndex}
+            setQout={setQout}
+            qoutes={qoutes}
+          />
+        )}
+        <a className="me-3" href="#">
+          <MDBCardImage
+            className="rounded-circle shadow-1-strong me-3"
+            src={avatar}
+            alt="avatar"
+            width="65"
+            height="65"
+          />
+        </a>
 
-      <div className="flex-grow-1 flex-shrink-1">
-        <div>
-          <div className="d-flex justify-content-between align-items-center">
-            <p className="mb-1">{name} </p>
+        <div className="flex-grow-1 flex-shrink-1">
+          <div>
+            <div className="d-flex justify-content-between align-items-center">
+              <p className="mb-1">{name} </p>
+            </div>
+            <p className="small mb-0">{comment.comment}</p>
           </div>
-          <p className="small mb-0">{comment}</p>
         </div>
+        {currentUser.email == name && (
+          <span>
+            <EditIcon
+              onClick={handleShowModal}
+              style={{ marginRight: "8px" }}
+            />
+            <DeleteIcon onClick={handleDeleteComment} />
+          </span>
+        )}
       </div>
-      {(currentUser.email == name) && <span>
-        <EditIcon onClick={handleShowModal} style={{ marginRight: "8px" }} />
-        <DeleteIcon onClick={handleDeleteComment} />
-      </span>}
+      <div className="comment-like-section">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleLikeOrDislike(
+              qoutes,
+              currentUser.email,
+              quoteIndex,
+              "like",
+              commentIndex
+            );
+          }}
+        >
+          Like {comment.likes.length}
+        </a>
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleLikeOrDislike(
+              qoutes,
+              currentUser.email,
+              quoteIndex,
+              "dislike",
+              commentIndex
+            );
+          }}
+        >
+          Dislike {comment.dislike.length}
+        </a>
+      </div>
     </div>
   );
 };

@@ -9,7 +9,7 @@ import { addQuote } from '../features/qoutes/qoutesSlice';
 import { selectAuth } from '../features/auth/authSilce';
 
 
-const QuoteModal = ({ show, handleClose, tagsOptions, initialQuote = null }) => {
+const QuoteModal = ({ show, handleClose, tagsOptions, initialQuote = null, index = null, setQout = null, qoutes = null }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useSelector(selectAuth);
@@ -63,6 +63,10 @@ const QuoteModal = ({ show, handleClose, tagsOptions, initialQuote = null }) => 
     };
 
     if (initialQuote) {
+      initialQuote.quote = quote
+      initialQuote.tags = selectedTags
+      qoutes[index] = initialQuote
+      setQout(qoutes);
       // Edit existing quote
       // dispatch(editQuote({ ...newQuote, id: initialQuote.id }));
     } else {
