@@ -11,10 +11,15 @@ const usersSlice = createSlice({
       state.push(action.payload);
     },
     editUser: (state, action) => {
-      state.push(action.payload);
+      const index = state.findIndex(user => user.email === action.payload.email);
+      if (index !== -1) {
+        state[index] = action.payload;
+      }
     },
   },
 });
 
 export const { addUser, editUser } = usersSlice.actions;
+export const selectUsers = state => state.users;
 export default usersSlice.reducer;
+

@@ -7,12 +7,14 @@ import { useDispatch } from 'react-redux';
 import { addUser, editUser } from './features/users/usersSlice';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { app } from '../firebase';
+import { useNavigate, Link } from 'react-router-dom';
 
 const storage = getStorage(app);
 
 
 function UserForm({ isEditMode = false, userData = null }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const defaultFormData = {
     firstName: '',
@@ -29,7 +31,7 @@ function UserForm({ isEditMode = false, userData = null }) {
   useEffect(() => {
     if (isEditMode && userData) {
       setFormData({
-        ...userData,
+        ...userData.user,
         profilePicture: null
       });
     }
@@ -52,6 +54,9 @@ function UserForm({ isEditMode = false, userData = null }) {
     } else {
       dispatch(addUser(formData));
     }
+
+    navigate('/login')
+
   };
 
   const uploadFileAndGetUrl = (file) => {
@@ -142,6 +147,8 @@ function UserForm({ isEditMode = false, userData = null }) {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                readOnly={isEditMode}
+                disabled={isEditMode}
               />
             </Form.Group>
 

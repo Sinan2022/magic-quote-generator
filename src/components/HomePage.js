@@ -1,0 +1,196 @@
+import React, { useState, useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import AddQuoteModal from './Modals/AddQuoteModal'; // Adjust the path to where your new component is located
+import QouteCard from './QouteCard';
+import CommentCard from './CommentCard';
+import Column from './Column';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUsers } from './features/users/usersSlice';
+import { selectQuotes } from './features/qoutes/qoutesSlice';
+
+
+
+
+const HomePage = () => {
+  // const users = useSelector(selectUsers);
+  const users = [
+    {
+      "firstName": "sinan",
+      "lastName": "saleem",
+      "username": "sinan",
+      "email": "sinan@gmail.com",
+      "password": "sinan",
+      "gender": "Male",
+      "profilePicture": "https://firebasestorage.googleapis.com/v0/b/ngo-registration-75ae0.appspot.com/o/Screenshot%202023-12-20%20at%204.50.53%20PM.png?alt=media&token=80961ba9-83cc-4425-b6c6-c62c53cad6f1"
+    },
+    {
+      "firstName": "umar",
+      "lastName": "tariq",
+      "username": "umar",
+      "email": "umar@gmail.com",
+      "password": "umar",
+      "gender": "Female",
+      "profilePicture": "https://firebasestorage.googleapis.com/v0/b/ngo-registration-75ae0.appspot.com/o/Screenshot%202023-11-29%20at%208.11.21%20PM.png?alt=media&token=3b8b4f70-a075-4807-a56b-e5894c21fb7e"
+    },
+    {
+      "firstName": "ali",
+      "lastName": "ahmad",
+      "username": "ali",
+      "email": "ali@gmail.com",
+      "password": "ali",
+      "gender": "Other",
+      "profilePicture": "https://firebasestorage.googleapis.com/v0/b/ngo-registration-75ae0.appspot.com/o/WhatsApp%20Image%202023-12-11%20at%2012.04.47%20AM.jpeg?alt=media&token=23387294-e84e-4a7a-b920-b9150d5869e9"
+    }
+  ]
+  const qoutes = useSelector(selectQuotes);
+  const [showModal, setShowModal] = useState(false);
+  const [qout, setQout] = useState([{
+    "author": "umar@gmail.com",
+    "quote": "This is post by umar",
+    "createdDate": "2023-12-27",
+    "createdTime": "15:37",
+    "tags": [
+      {
+        "name": "sports",
+        "id": 1
+      },
+      {
+        "name": "inspiration",
+        "id": 3
+      }
+    ],
+    "comments": [
+      {
+        "author": "ali@gmail.com",
+        "comment": "Coment by Ali",
+        "likes": [],
+        "dislike": []
+
+      },
+      {
+        "author": "umar@gmail.com",
+        "comment": "Comment by Umar",
+        "likes": [],
+        "dislike": []
+
+      },
+      {
+        "author": "sinan@gmail.com",
+        "comment": "Comment by Sinan",
+        "likes": [],
+        "dislike": []
+
+      }
+    ],
+    "likes": [],
+    "dislike": []
+  },
+
+  {
+    "author": "sinan@gmail.com",
+    "quote": "This is a post by sinan",
+    "createdDate": "2023-12-27",
+    "createdTime": "15:37",
+    "tags": [
+      {
+        "name": "sports",
+        "id": 1
+      },
+      {
+        "name": "inspiration",
+        "id": 3
+      }
+    ],
+    "comments": [
+      {
+        "author": "ali@gmail.com",
+        "comment": "Coment by Ali2",
+        "likes": [],
+        "dislike": []
+
+      },
+      {
+        "author": "umar@gmail.com",
+        "comment": "Comment by Umar3",
+        "likes": [],
+        "dislike": []
+
+      },
+      {
+        "author": "sinan@gmail.com",
+        "comment": "Comment by Sinan4",
+        "likes": [],
+        "dislike": []
+
+      }
+    ],
+    "likes": [],
+    "dislike": []
+  }]);
+
+  useEffect(() => {
+    console.log("Qoute prop updated in CommentCard:", qout);
+  }, [qout]);
+
+  const tagsOptions = [
+    { name: "sports", id: 1 },
+    { name: "life", id: 2 },
+    { name: "inspiration", id: 3 }
+  ];
+
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = () => setShowModal(true);
+
+  //
+  const toggleLikeOrDislike = (quotes, email, index, action) => {
+    // Check if the index is valid
+    if (index < 0 || index >= quotes.length) {
+      console.error("Invalid index");
+      return;
+    }
+
+    // Get the quote at the specified index
+    const quote = quotes[index];
+
+    // Function to toggle email in the array
+    const toggleEmailInArray = (array) => {
+      const emailIndex = array.indexOf(email);
+      if (emailIndex === -1) {
+        // Email not in array, add it
+        array.push(email);
+      } else {
+        // Email is in array, remove it
+        array.splice(emailIndex, 1);
+      }
+    };
+
+    // Depending on the action, update the likes or dislikes
+    if (action === 'like') {
+      toggleEmailInArray(quote.likes);
+    } else if (action === 'dislike') {
+      toggleEmailInArray(quote.dislike);
+    } else {
+      console.error("Invalid action");
+    }
+    qout[index] = quote
+    setQout(qout);
+
+  };
+  return (
+    <div>
+      <Button variant="primary" onClick={handleShowModal}>
+        Launch Add Quote Modal
+      </Button>
+      <AddQuoteModal
+        show={showModal}
+        handleClose={handleCloseModal}
+        tagsOptions={tagsOptions}
+      />
+      {qout.map((quote, index) => (
+        <CommentCard index={index} qoute={quote} users={users} toggleLikeOrDislike={toggleLikeOrDislike} qoutes={qout} setQout={setQout} />
+      ))}
+    </div>
+  );
+};
+
+export default HomePage;
